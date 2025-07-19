@@ -1,0 +1,2 @@
+# promptify
+smart tool
