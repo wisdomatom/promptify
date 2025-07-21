@@ -1,0 +1,10 @@
+{
+  "title": "Promptify",
+  "input_placeholder": "Type @command, e.g. @diff...",
+  "input_tip": "Type <1>@diff</1> to enter text diff mode",
+  "diff_title": "@diff Text Diff Viewer",
+  "diff_btn": "Compare",
+  "diff_back": "← Back to Home",
+  "diff_old": "Old Text",
+  "diff_new": "New Text"
+} 
