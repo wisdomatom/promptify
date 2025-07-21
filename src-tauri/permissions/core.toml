@@ -1,0 +1,10 @@
+[[set]]
+identifier = "core"
+description = """ Core permissions. 
+"""
+permissions = [
+    "fs:read-files",
+    "fs:scope-home",
+    "fs:allow-mkdir",
+    "core:window:allow-set-decorations"
+]

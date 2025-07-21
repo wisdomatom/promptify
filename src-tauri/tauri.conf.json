@@ -12,11 +12,13 @@
   "app": {
     "windows": [
       {
-        "title": "promptify",
-        "width": 800,
-        "height": 600,
+        "title": "Promptify",
+        "width": 600,
+        "height": 400,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "decorations": true,
+        "transparent": true
       }
     ],
     "security": {
