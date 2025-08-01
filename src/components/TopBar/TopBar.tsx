@@ -24,15 +24,15 @@ const TopBar: React.FC<TopBarProps> = ({ value, onChange, onEnter, theme, leftBu
       style={{
         width: '100%',
         height: 56,
-        background: theme.bg, // 20% 透明度
+        background: theme.inputBg, // 20% 透明度
         display: 'flex',
         alignItems: 'center',
         // 修改 padding 来为拖动区域留出空间
         justifyContent: 'space-between',
         padding: '0 12px',
         boxSizing: 'border-box',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        // backdropFilter: 'blur(12px)',
+        // WebkitBackdropFilter: 'blur(12px)',
         borderTopLeftRadius: 12,
         borderTopRightRadius: 12,
       }}
@@ -47,7 +47,7 @@ const TopBar: React.FC<TopBarProps> = ({ value, onChange, onEnter, theme, leftBu
         value={value}
         onChange={e => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="输入 @指令..."
+        placeholder="Search for commands..."
         style={{
           flex: 1, // 占据可用空间
           height: '70%',
@@ -57,9 +57,9 @@ const TopBar: React.FC<TopBarProps> = ({ value, onChange, onEnter, theme, leftBu
           background: 'none', // 背景设为透明，以显示父元素的毛玻璃效果
           color: theme.inputText,
           padding: '0 14px', // 输入框内部也需要一些 padding
-          boxShadow: 'none',
+          // boxShadow: 'none',
           margin: '0 12px', // 与左右按钮/边缘保持间距
-          transition: 'box-shadow 0.18s',
+          // transition: 'box-shadow 0.18s',
         }}
         autoFocus
       />

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DiffPage } from './features/diff';
+import { HomePage } from './features/home';
 import { useTranslation } from 'react-i18next';
 import TopBar from './components/TopBar';
 import MainContent from './components/MainContent';
@@ -34,12 +35,11 @@ function App() {
     // 未来可扩展更多指令
   };
 
-  const isHomePage = page === 'home';
   let mainContent = null;
   if (page === 'diff') {
     mainContent = <DiffPage onBack={() => setPage('home')} />;
   } else {
-    mainContent = <div style={{ color: theme.text, fontSize: 20, opacity: 0.5 }}>欢迎使用 Promptify！</div>;
+    mainContent = <HomePage theme={theme} />;
   }
 
   return (
@@ -47,20 +47,21 @@ function App() {
       style={{
         height: "100vh", // 使用 height 确保容器占满整个视窗
         width: "100%",
-        background: "none",
         display: "flex",
         flexDirection: "column",
         borderRadius: 12,
         overflow: 'hidden', // 保留以裁剪圆角
+        // 将模糊和背景色统一应用到父容器，以提高性能和视觉一致性
+        // backdropFilter: "blur(10px)",
+        // background: "transparent",
+        background: theme.bg,
       }}
     >
       {/* 区域1：顶部输入框区域 */}
       <div
         style={{
           flexShrink: 0, // 防止此区域在内容过多时被压缩
-          zIndex: 10,
-          backdropFilter: "blur(10px)",
-          background: 'none',
+          // 背景和模糊效果已移至父容器
         }}
       >
         <TopBar
@@ -76,20 +77,18 @@ function App() {
           flex: 1, // 关键：让此区域占据所有剩余空间
           minWidth: 0, // 防止子元素过宽导致 flex 布局破坏
           overflowY: "auto", // 只在垂直方向上需要时显示滚动条
-          overflowX: "auto", // 隐藏水平滚动条
-          backdropFilter: "blur(10px)",
-          background: "none",
+          overflowX: "hidden", // 隐藏水平滚动条
+          // 背景和模糊效果已移至父容器
         }}
       >
-        <MainContent theme={theme} center={isHomePage}>{mainContent}</MainContent>
+        <MainContent theme={theme}>{mainContent}</MainContent>
       </div>
       {/* 区域3：底部菜单栏 */}
       <div
         style={{
+          background: theme.bottom,
           flexShrink: 0, // 防止此区域在内容过多时被压缩
-          zIndex: 10,
-          backdropFilter: "blur(10px)",
-          background: theme.bg,
+          // 背景和模糊效果已移至父容器
         }}
       >
         <BottomBar theme={theme}>
