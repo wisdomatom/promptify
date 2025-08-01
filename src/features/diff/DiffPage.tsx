@@ -40,7 +40,10 @@ const DiffPage: React.FC<DiffPageProps> = ({ onBack }) => {
       </div>
       <button onClick={handleCompare} style={{ marginBottom: 24 }}>{t('diff_btn')}</button>
       {showDiff && (
-        <DiffViewer oldValue={oldValue} newValue={newValue} />
+        // 添加一个包裹容器来处理水平滚动
+        <div style={{ overflowX: 'auto' }}>
+          <DiffViewer oldValue={oldValue} newValue={newValue} />
+        </div>
       )}
     </div>
   );

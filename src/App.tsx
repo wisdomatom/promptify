@@ -22,7 +22,7 @@ function App() {
     if (minimal) {
       appWindow().setDecorations(false);
     } else {
-      appWindow().setDecorations(true);
+      appWindow().setDecorations(false);
     }
   }, [minimal]);
 
@@ -34,6 +34,7 @@ function App() {
     // 未来可扩展更多指令
   };
 
+  const isHomePage = page === 'home';
   let mainContent = null;
   if (page === 'diff') {
     mainContent = <DiffPage onBack={() => setPage('home')} />;
@@ -44,17 +45,24 @@ function App() {
   return (
     <div
       style={{
-        minHeight: '100vh',
-        width: '100vw',
-        background: theme.bg,
-        display: 'flex',
-        flexDirection: 'column',
-        // borderRadius: 16, // 移除圆角
-        // overflow: 'hidden', // 移除溢出隐藏
+        height: "100vh", // 使用 height 确保容器占满整个视窗
+        width: "100%",
+        background: "none",
+        display: "flex",
+        flexDirection: "column",
+        borderRadius: 12,
+        overflow: 'hidden', // 保留以裁剪圆角
       }}
     >
       {/* 区域1：顶部输入框区域 */}
-      <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 10 }}>
+      <div
+        style={{
+          flexShrink: 0, // 防止此区域在内容过多时被压缩
+          zIndex: 10,
+          backdropFilter: "blur(10px)",
+          background: 'none',
+        }}
+      >
         <TopBar
           value={input}
           onChange={setInput}
@@ -63,93 +71,119 @@ function App() {
         />
       </div>
       {/* 区域2：功能展示区 */}
-      <div style={{
-        marginTop: 56,
-        marginBottom: 56,
-        height: 'calc(100vh - 112px)',
-        overflow: 'auto',
-        width: '100vw',
-      }}>
-        <MainContent theme={theme}>
-          {mainContent}
-        </MainContent>
+      <div
+        style={{
+          flex: 1, // 关键：让此区域占据所有剩余空间
+          minWidth: 0, // 防止子元素过宽导致 flex 布局破坏
+          overflowY: "auto", // 只在垂直方向上需要时显示滚动条
+          overflowX: "auto", // 隐藏水平滚动条
+          backdropFilter: "blur(10px)",
+          background: "none",
+        }}
+      >
+        <MainContent theme={theme} center={isHomePage}>{mainContent}</MainContent>
       </div>
       {/* 区域3：底部菜单栏 */}
-      <div style={{ position: 'fixed', bottom: 0, left: 0, width: '100vw', zIndex: 10 }}>
+      <div
+        style={{
+          flexShrink: 0, // 防止此区域在内容过多时被压缩
+          zIndex: 10,
+          backdropFilter: "blur(10px)",
+          background: theme.bg,
+        }}
+      >
         <BottomBar theme={theme}>
-          <div style={{ display: 'flex', gap: 16 }}>
+          <div style={{ display: "flex", gap: 16 }}>
             {/* 语言切换 */}
             <button
-              onClick={() => i18n.changeLanguage(i18n.language === 'zh' ? 'en' : 'zh')}
+              onClick={() =>
+                i18n.changeLanguage(i18n.language === "zh" ? "en" : "zh")
+              }
               style={{
                 background: theme.btn,
                 color: theme.text,
-                border: 'none',
+                border: "none",
                 borderRadius: 6,
-                padding: '6px 16px',
-                cursor: 'pointer',
+                padding: "6px 16px",
+                cursor: "pointer",
                 fontSize: 15,
-                transition: 'background 0.18s',
+                transition: "background 0.18s",
               }}
-              onMouseOver={e => (e.currentTarget.style.background = theme.btnHover)}
-              onMouseOut={e => (e.currentTarget.style.background = theme.btn)}
+              onMouseOver={(e) =>
+                (e.currentTarget.style.background = theme.btnHover)
+              }
+              onMouseOut={(e) => (e.currentTarget.style.background = theme.btn)}
             >
-              {i18n.language === 'zh' ? 'EN' : '中文'}
+              {i18n.language === "zh" ? "EN" : "中文"}
             </button>
             {/* 主题切换 */}
             <button
-              onClick={() => setThemeMode(themeMode === 'light' ? 'dark' : 'light')}
+              onClick={() =>
+                setThemeMode(themeMode === "light" ? "dark" : "light")
+              }
               style={{
                 background: theme.btn,
                 color: theme.text,
-                border: 'none',
+                border: "none",
                 borderRadius: 6,
-                padding: '6px 16px',
-                cursor: 'pointer',
+                padding: "6px 16px",
+                cursor: "pointer",
                 fontSize: 15,
-                transition: 'background 0.18s',
+                transition: "background 0.18s",
               }}
-              onMouseOver={e => (e.currentTarget.style.background = theme.btnHover)}
-              onMouseOut={e => (e.currentTarget.style.background = theme.btn)}
+              onMouseOver={(e) =>
+                (e.currentTarget.style.background = theme.btnHover)
+              }
+              onMouseOut={(e) => (e.currentTarget.style.background = theme.btn)}
             >
-              {themeMode === 'light' ? '🌙 暗色' : '☀️ 亮色'}
+              {themeMode === "light" ? "🌙 暗色" : "☀️ 亮色"}
             </button>
             {/* 极简模式 */}
             <button
-              onClick={() => setMinimal(m => !m)}
+              onClick={() => setMinimal((m) => !m)}
               style={{
                 background: theme.btn,
                 color: theme.text,
-                border: 'none',
+                border: "none",
                 borderRadius: 6,
-                padding: '6px 16px',
-                cursor: 'pointer',
+                padding: "6px 16px",
+                cursor: "pointer",
                 fontSize: 15,
-                transition: 'background 0.18s',
+                transition: "background 0.18s",
               }}
-              onMouseOver={e => (e.currentTarget.style.background = theme.btnHover)}
-              onMouseOut={e => (e.currentTarget.style.background = theme.btn)}
+              onMouseOver={(e) =>
+                (e.currentTarget.style.background = theme.btnHover)
+              }
+              onMouseOut={(e) => (e.currentTarget.style.background = theme.btn)}
             >
-              {minimal ? (i18n.language === 'zh' ? '退出极简' : 'Normal') : (i18n.language === 'zh' ? '极简模式' : 'Minimal')}
+              {minimal
+                ? i18n.language === "zh"
+                  ? "退出极简"
+                  : "Normal"
+                : i18n.language === "zh"
+                ? "极简模式"
+                : "Minimal"}
             </button>
           </div>
           {/* 右侧可放设置等按钮 */}
-          <div style={{ display: 'flex', gap: 16 }}>
+          <div style={{ display: "flex", gap: 16 }}>
             <button
               style={{
                 background: theme.btn,
                 color: theme.text,
-                border: 'none',
+                border: "none",
                 borderRadius: 6,
-                padding: '6px 16px',
-                cursor: 'pointer',
+                padding: "6px 16px",
+                cursor: "pointer",
                 fontSize: 15,
-                transition: 'background 0.18s',
+                transition: "background 0.18s",
               }}
-              onMouseOver={e => (e.currentTarget.style.background = theme.btnHover)}
-              onMouseOut={e => (e.currentTarget.style.background = theme.btn)}
+              onMouseOver={(e) =>
+                (e.currentTarget.style.background = theme.btnHover)
+              }
+              onMouseOut={(e) => (e.currentTarget.style.background = theme.btn)}
             >
-              {i18n.language === 'zh' ? '设置' : 'Settings'}
+              {i18n.language === "zh" ? "设置" : "Settings"}
             </button>
           </div>
         </BottomBar>
