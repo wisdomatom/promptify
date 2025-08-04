@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef, forwardRef } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { lightTheme, darkTheme } from '../../theme';
+
+type PageType = 'home' | 'diff' | 'clipboard';
 
 // 定义从后端接收的数据结构
 interface AppInfo {
@@ -9,21 +10,24 @@ interface AppInfo {
   path: string;
 }
 
-interface ClipboardItem {
-  id: number;
-  content: string;
+// 定义内置命令的数据结构
+interface Command {
+  id: PageType;
+  name: string;
+  icon: string;
 }
 
 // 定义一个统一的列表项类型，方便管理
 type UnifiedListItem = {
   id: string;
-  type: 'clipboard' | 'app';
-  data: ClipboardItem | AppInfo;
+  type: 'command' | 'application';
+  data: Command | AppInfo;
   node: React.ReactNode;
 };
 
 interface HomePageProps {
   theme: typeof lightTheme | typeof darkTheme;
+  onNavigate: (page: PageType) => void;
 }
 
 // 列表项通用组件
@@ -62,8 +66,7 @@ const ListHeader: React.FC<{ children: React.ReactNode, theme: HomePageProps['th
   </div>
 );
 
-const HomePage: React.FC<HomePageProps> = ({ theme }) => {
-  const [clipboardHistory, setClipboardHistory] = useState<ClipboardItem[]>([]);
+const HomePage: React.FC<HomePageProps> = ({ theme, onNavigate }) => {
   const [installedApps, setInstalledApps] = useState<AppInfo[]>([]);
   const [error, setError] = useState('');
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
@@ -71,25 +74,29 @@ const HomePage: React.FC<HomePageProps> = ({ theme }) => {
   // 使用 Ref 来存储每个列表项的 DOM 节点，以便后续滚动到视图内
   const itemRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
+  // 定义静态的内置命令
+  const builtInCommands: Command[] = useMemo(() => [
+    { id: 'diff', name: 'Compare Text', icon: '↔️' },
+    { id: 'clipboard', name: 'Clipboard History', icon: '📋' },
+  ], []);
+
   // 使用 useMemo 将两个数据源合并为一个统一的列表，当数据源变化时自动重新计算
   const allItems = useMemo<UnifiedListItem[]>(() => {
-    const suggestions: UnifiedListItem[] = clipboardHistory.map((item) => ({
-      id: `clipboard-${item.id}`, // 使用数据自带的稳定 ID 作为 key
-      type: 'clipboard',
-      data: item,
+    const commandItems: UnifiedListItem[] = builtInCommands.map((command) => ({
+      id: `command-${command.id}`,
+      type: 'command',
+      data: command,
       node: (
         <>
-          <span style={{ marginRight: 12, width: 16 }}>📋</span>
-          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {item.content}
-          </span>
+          <span style={{ marginRight: 12, width: 16 }}>{command.icon}</span>
+          <span>{command.name}</span>
         </>
       ),
     }));
 
-    const commands: UnifiedListItem[] = installedApps.map((app) => ({
-      id: `app-${app.path}`, // 使用唯一的路径作为稳定 ID
-      type: 'app',
+    const applicationItems: UnifiedListItem[] = installedApps.map((app) => ({
+      id: `app-${app.path}`,
+      type: 'application',
       data: app,
       node: (
         <>
@@ -99,19 +106,10 @@ const HomePage: React.FC<HomePageProps> = ({ theme }) => {
       ),
     }));
 
-    return [...suggestions, ...commands];
-  }, [clipboardHistory, installedApps]);
+    return [...commandItems, ...applicationItems];
+  }, [installedApps, builtInCommands]);
 
   useEffect(() => {
-    // 初始加载数据
-    // 获取剪贴板历史
-    invoke<ClipboardItem[]>('get_clipboard_history')
-      .then(setClipboardHistory)
-      .catch(err => {
-        console.error('Failed to get clipboard history:', err);
-        setError('Could not load clipboard history.');
-      });
-
     // 获取已安装应用
     invoke<AppInfo[]>('get_installed_apps')
       .then(setInstalledApps)
@@ -154,15 +152,13 @@ const HomePage: React.FC<HomePageProps> = ({ theme }) => {
         const currentItem = allItems[currentIndex];
         if (!currentItem) return;
 
-        if (currentItem.type === 'app') {
+        if (currentItem.type === 'application') {
           // 如果是应用，调用后端命令打开它
           const appData = currentItem.data as AppInfo;
           invoke('open_app', { path: appData.path }).catch(console.error);
-        } else if (currentItem.type === 'clipboard') {
-          // 如果是剪贴板历史，将其内容写回系统剪贴板
-          const clipboardData = currentItem.data as ClipboardItem;
-          writeText(clipboardData.content).catch(console.error);
-          // 未来可以增加一个“已复制”的提示
+        } else if (currentItem.type === 'command') {
+          const commandData = currentItem.data as Command;
+          onNavigate(commandData.id);
         }
       }
     };
@@ -172,7 +168,7 @@ const HomePage: React.FC<HomePageProps> = ({ theme }) => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [selectedItem, allItems]); // 依赖项改变时，重新创建事件处理器
+  }, [selectedItem, allItems, onNavigate]); // 依赖项改变时，重新创建事件处理器
 
   // 当选中项改变时，自动滚动到该项的位置
   useEffect(() => {
@@ -190,8 +186,8 @@ const HomePage: React.FC<HomePageProps> = ({ theme }) => {
   }
 
   // 将统一列表按类型分组，以便渲染
-  const suggestionItems = allItems.filter(item => item.type === 'clipboard');
-  const commandItems = allItems.filter(item => item.type === 'app');
+  const suggestionItems = allItems.filter(item => item.type === 'command');
+  const commandItems = allItems.filter(item => item.type === 'application');
 
   return (
     <div style={{ paddingBottom: 16 }}>

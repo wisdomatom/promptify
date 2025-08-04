@@ -1,0 +1,1 @@
+export { default as ClipboardHistoryPage } from './ClipboardHistoryPage';
