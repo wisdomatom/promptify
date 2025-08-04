@@ -7,11 +7,13 @@ import MainContent from './components/MainContent';
 import BottomBar from './components/BottomBar';
 import { lightTheme, darkTheme } from './theme';
 import { getCurrentWindow as appWindow } from '@tauri-apps/api/window';
+import type { CommandID } from './features/home/HomePage';
 
-export type PageType = 'home' | 'diff';
+// 定义应用内所有可能的页面ID
+type PageID = 'home' | CommandID;
 
 function App() {
-  const [page, setPage] = useState<PageType>('home');
+  const [page, setPage] = useState<PageID>('home');
   const [input, setInput] = useState('');
   const [minimal, setMinimal] = useState(false);
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
@@ -39,7 +41,7 @@ function App() {
   if (page === 'diff') {
     mainContent = <DiffPage onBack={() => setPage('home')} />;
   } else {
-    mainContent = <HomePage theme={theme} />;
+    mainContent = <HomePage theme={theme} onNavigate={setPage} />;
   }
 
   return (

@@ -2,17 +2,18 @@ import React, { useState, useEffect, useMemo, useRef, forwardRef } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { lightTheme, darkTheme } from '../../theme';
 
-type PageType = 'home' | 'diff' | 'clipboard';
-
 // 定义从后端接收的数据结构
 interface AppInfo {
   name: string;
   path: string;
 }
 
+// 从内置命令中提取 CommandID 类型
+export type CommandID = 'diff' | 'clipboard';
+
 // 定义内置命令的数据结构
 interface Command {
-  id: PageType;
+  id: CommandID;
   name: string;
   icon: string;
 }
@@ -27,7 +28,7 @@ type UnifiedListItem = {
 
 interface HomePageProps {
   theme: typeof lightTheme | typeof darkTheme;
-  onNavigate: (page: PageType) => void;
+  onNavigate: (page: CommandID) => void;
 }
 
 // 列表项通用组件
@@ -186,8 +187,8 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onNavigate }) => {
   }
 
   // 将统一列表按类型分组，以便渲染
-  const suggestionItems = allItems.filter(item => item.type === 'command');
-  const commandItems = allItems.filter(item => item.type === 'application');
+  const suggestionItems = allItems.filter(item => item.type === 'command'); // These are the built-in commands
+  const applicationItems = allItems.filter(item => item.type === 'application'); // These are the installed apps
 
   return (
     <div style={{ paddingBottom: 16 }}>
@@ -212,10 +213,10 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onNavigate }) => {
       )}
 
       {/* Commands Section */}
-      {commandItems.length > 0 && (
+      {applicationItems.length > 0 && (
         <>
           <ListHeader theme={theme}>Commands</ListHeader>
-          {commandItems.map(item => (
+          {applicationItems.map(item => (
             <ListItem
               key={item.id}
               ref={node => {
