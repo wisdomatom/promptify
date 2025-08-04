@@ -95,6 +95,30 @@ fn get_installed_apps() -> Result<Vec<AppInfo>, String> {
     ])
 }
 
+/// [Tauri 命令] 打开指定的应用程序
+#[tauri::command]
+fn open_app(path: String) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        let status = std::process::Command::new("open")
+            .arg("-a")
+            .arg(&path)
+            .status()
+            .map_err(|e| e.to_string())?;
+
+        if status.success() {
+            Ok(())
+        } else {
+            Err(format!("Failed to open app at path: {}", path))
+        }
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        // 对于 Windows/Linux，尝试使用 Tauri 的 shell open API 作为跨平台的回退方案
+        tauri::api::shell::open(&path, None).map_err(|e| e.to_string())
+    }
+}
+
 fn main() {
   tauri::Builder::default()
     .setup(|app| {
@@ -112,8 +136,10 @@ fn main() {
     // 在这里注册我们所有的后端命令
     .invoke_handler(tauri::generate_handler![
         get_clipboard_history,
-        get_installed_apps
+        get_installed_apps,
+        open_app
     ])
+    .plugin(tauri_plugin_clipboard_manager::init())
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
