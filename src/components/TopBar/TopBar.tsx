@@ -24,7 +24,8 @@ const TopBar: React.FC<TopBarProps> = ({ value, onChange, onEnter, theme, leftBu
       style={{
         width: '100%',
         height: 56,
-        background: theme.inputBg, // 20% 透明度
+        // background: theme.inputBg, // 20% 透明度
+        // background: 'transparent', // 20% 透明度
         display: 'flex',
         alignItems: 'center',
         // 修改 padding 来为拖动区域留出空间
@@ -33,8 +34,8 @@ const TopBar: React.FC<TopBarProps> = ({ value, onChange, onEnter, theme, leftBu
         boxSizing: 'border-box',
         // backdropFilter: 'blur(12px)',
         // WebkitBackdropFilter: 'blur(12px)',
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12,
+        borderTopLeftRadius: theme.radius,
+        borderTopRightRadius: theme.radius,
       }}
     >
       {/* 左侧按钮 */}
@@ -54,7 +55,7 @@ const TopBar: React.FC<TopBarProps> = ({ value, onChange, onEnter, theme, leftBu
           fontSize: 17,
           border: 'none',
           outline: 'none',
-          background: 'none', // 背景设为透明，以显示父元素的毛玻璃效果
+          background: 'transparent', // 背景设为透明，以显示父元素的毛玻璃效果
           color: theme.inputText,
           padding: '0 14px', // 输入框内部也需要一些 padding
           // boxShadow: 'none',

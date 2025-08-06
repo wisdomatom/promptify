@@ -125,7 +125,7 @@ fn main() {
         let window = app.get_webview_window("main").unwrap();
 
         #[cfg(target_os = "macos")]
-        apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None)
+        apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, Some(12.0))
           .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
 
         // Note: For Windows, you would use a different function.

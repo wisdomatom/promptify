@@ -55,15 +55,14 @@ function App() {
         overflow: 'hidden', // 保留以裁剪圆角
         // 将模糊和背景色统一应用到父容器，以提高性能和视觉一致性
         // backdropFilter: "blur(10px)",
-        // background: "transparent",
-        background: theme.bg,
+        background: "transparent",
+        // background: theme.bg,
       }}
     >
       {/* 区域1：顶部输入框区域 */}
       <div
         style={{
           flexShrink: 0, // 防止此区域在内容过多时被压缩
-          // 背景和模糊效果已移至父容器
         }}
       >
         <TopBar
