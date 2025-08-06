@@ -51,7 +51,7 @@ function App() {
         width: "100%",
         display: "flex",
         flexDirection: "column",
-        borderRadius: 12,
+        borderRadius: 8,
         overflow: 'hidden', // 保留以裁剪圆角
         // 将模糊和背景色统一应用到父容器，以提高性能和视觉一致性
         // backdropFilter: "blur(10px)",
